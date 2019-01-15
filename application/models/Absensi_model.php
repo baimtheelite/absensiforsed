@@ -7,6 +7,14 @@ class Absensi_model extends CI_Model{
         return $res->result_array(); // Kode ini digunakan untuk mengembalikan hasil operasi $res menjadi sebuah array
     }
 
+    public function DataAnggota($number, $offset){
+        return $query = $this->db->get('tbl_anggota', $number, $offset)->result();
+    }
+
+    public function jumlah_data(){
+        return $this->db->get('tbl_anggota')->num_rows();
+    }
+
     public function query($query){
         $res=$this->db->query($query);
         return $res->result_array();
@@ -46,5 +54,10 @@ class Absensi_model extends CI_Model{
         $this->db->select_max($column);
         $res = $this->db->get($table);
         return $res->result_array();
+    }
+
+    public function LoginAdmin($user, $password){
+        $res = $this->db->get_where('tbl_admin', array('user' => $user, 'password' => $password));
+        return $res;
     }
 }

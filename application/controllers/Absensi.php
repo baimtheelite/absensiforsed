@@ -7,13 +7,41 @@ class Absensi extends CI_Controller{
     }
 
     public function index(){
-        $data = $this->absensi_model->query('SELECT * FROM tbl_anggota ORDER BY nama');
-        $max = $this->absensi_model->max('tbl_kehadiran', 'id_tgl');
-        $arr = array(
-            'data' => $data,
-            'max' => ($max[0]['id_tgl'] + 1)
-         );
-        $this->load->view('v_absensi', $arr);
+        if($this->session->userdata('user')){
+                $data       = $this->absensi_model->query('SELECT * FROM tbl_anggota ORDER BY nama');
+                $datamuhadir = $this->absensi_model->GetAnggota('tbl_muhadir');
+                $max         = $this->absensi_model->max('tbl_kehadiran', 'id_tgl');
+
+                $arr = array(
+                    'data' => $data,
+                    'max' => ($max[0]['id_tgl'] + 1),
+                    'datamuhadir' => $datamuhadir
+                 );
+
+                $this->load->view('v_absensi', $arr);
+            }else{
+                $this->load->view('login');
+            }           
+    }
+
+    public function login(){
+        $user     = $this->input->post('user');
+        $password  = $this->input->post('password');
+
+        $query = $this->absensi_model->LoginAdmin($user, $password);
+        if($query->num_rows() > 0){
+            foreach($query->result() as $data){
+            $this->session->set_userdata('user', $data->user);
+        }
+            redirect('/', 'refresh');
+            }else{
+                echo "<script>alert('Username atau password salah!<br> Status: ".$query."'); history.back();</script>";
+            }
+ }
+
+    public function logout(){
+        $this->session->unset_userdata('user');
+        redirect(base_url('Absensi/index'));
     }
 
     public function daftar_anggota(){
@@ -102,9 +130,20 @@ class Absensi extends CI_Controller{
     }
 
     public function rekor_presensi($id=1){
+
+        $jumlah_data = $this->absensi_model->jumlah_data();
+        $config['base_url'] = base_url().'absensi/rekor_presensi/';
+        $config['total_rows'] = $jumlah_data;
+        $config['per_page'] = 25;
+        $from = $this->uri->segment(2);
+        $this->pagination->initialize($config);
+
         $data = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal, COUNT(tbl_kehadiran.id) as Jumlah_Hadir FROM tbl_anggota, tbl_kehadiran WHERE tbl_anggota.id = tbl_kehadiran.id AND tbl_kehadiran.hadir = 'Hadir' GROUP BY tbl_anggota.id ORDER BY Jumlah_Hadir DESC");
+
         $absensi = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal FROM tbl_anggota a, tbl_kehadiran b WHERE a.id=$id AND b.id=$id");
+
         $rekortgl = $this->absensi_model->query("SELECT DISTINCT(id_tgl), DATE_FORMAT(tanggal,'%d %M %Y') as tanggal, muhadir FROM tbl_kehadiran");
+
        $anggota = $this->absensi_model->GetWhere('tbl_anggota', array('id' => $id));
 
         $data = array(
