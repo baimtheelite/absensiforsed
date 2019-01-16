@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="<?php echo base_url("resources/js/jquery-3.3.1.js"); ?>"></script>
+    <link rel="icon" href="<?php echo base_url('resources/favicon/forsed.jpg') ;?>">
     <style type="text/css">
     #ubah{
         color: blue;
@@ -52,7 +53,7 @@
                 <button id="kirim" type="submit" class="btn btn-primary enable" disabled>Submit</button> &nbsp;
                 <span id="ubah">Ubah Data?</span>  
             </form>
-        <a class="btn btn-info" href="<?= site_url(); ?>" style="margin-top: 32px">Kembali</a>         
+        <a class="btn btn-info" href="<?= site_url('Absensi/daftar_anggota'); ?>" style="margin-top: 32px">Kembali</a>         
         </div>
         <div class="col-lg-6">
             <h2 class="text-center">Absensi</h2>            

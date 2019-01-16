@@ -4,6 +4,8 @@ class Absensi extends CI_Controller{
     public function __construct(){
         parent::__construct();
         $this->load->model('absensi_model');
+
+        $active_link = $this->uri->segment(2);
     }
 
     public function index(){
@@ -12,10 +14,13 @@ class Absensi extends CI_Controller{
                 $datamuhadir = $this->absensi_model->GetAnggota('tbl_muhadir');
                 $max         = $this->absensi_model->max('tbl_kehadiran', 'id_tgl');
 
+                $active_link = '';
+
                 $arr = array(
                     'data' => $data,
                     'max' => ($max[0]['id_tgl'] + 1),
-                    'datamuhadir' => $datamuhadir
+                    'datamuhadir' => $datamuhadir,
+                    'active' => $active_link
                  );
 
                 $this->load->view('v_absensi', $arr);
@@ -28,14 +33,16 @@ class Absensi extends CI_Controller{
         $user     = $this->input->post('user');
         $password  = $this->input->post('password');
 
-        $query = $this->absensi_model->LoginAdmin($user, $password);
+        $query = $this->absensi_model->LoginAdmin($user, md5($password));
         if($query->num_rows() > 0){
             foreach($query->result() as $data){
             $this->session->set_userdata('user', $data->user);
+            $nama = $data->user;
         }
+            $this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible fade show role="alert"">Berhasil login! Selamat Datang '.ucfirst($nama).'! <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
             redirect('/', 'refresh');
             }else{
-                echo "<script>alert('Username atau password salah!<br> Status: ".$query."'); history.back();</script>";
+                echo "<script>alert('Username atau password salah!<br>'); history.back();</script>";
             }
  }
 
@@ -45,16 +52,36 @@ class Absensi extends CI_Controller{
     }
 
     public function daftar_anggota(){
+        $active_link = $this->uri->segment(2);
+
+        if(isset($_GET['carinama'])) {
+            $nama = $this->input->get('carinama');
+            $data = $this->absensi_model->query('SELECT * FROM tbl_anggota WHERE nama LIKE "%'.$nama.'%"');
+            $array = array(
+                    'data' => $data,
+                    'nama' => $nama,
+                    'active' => $active_link
+                 );
+        $this->load->view('daftar_anggota', $array);
+
+        }else{
         $data = $this->absensi_model->query('SELECT * FROM tbl_anggota ORDER BY nama');
-        $data = array('data' => $data);
-        $this->load->view('daftar_anggota', $data);       
+        $array = array(
+                    'data' => $data,
+                    'active' => $active_link
+                 );
+        $this->load->view('daftar_anggota', $array);
+        }       
     }
+
+
 
     public function pendaftaran(){
         $this->load->view('pendaftaran_anggota');
     }
 
     public function insert(){
+        if(isset($_POST['insertanggota'])){
          $data = array(
             'nama' => $this->input->post('nama'),
             'alamat' => $this->input->post('alamat'),
@@ -73,6 +100,21 @@ class Absensi extends CI_Controller{
 
         $this->load->view('pendaftaran_berhasil', $summary);
          $this->absensi_model->Insert('tbl_anggota', $data);
+     }
+
+     if (isset($_POST['insertmuhadir'])) {
+         $namamuhadir = $this->input->post('namamuhadir');
+         $data = array(
+            'nama_muhadir' => $namamuhadir
+         );
+         $id = $this->absensi_model->Insert('tbl_muhadir', $data);
+
+         if($id){
+         $this->session->set_flashdata('muhadir_success', '<div class="alert alert-success alert-dismissible fade show role="alert"">'.$namamuhadir.' berhasil ditambahkan.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+
+        redirect('/','refresh');
+        }
+     }
         // redirect(site_url('Absensi'));
     }
 
@@ -126,10 +168,12 @@ class Absensi extends CI_Controller{
         foreach ($hadir as $key => $val) {
             $this->absensi_model->qry("INSERT INTO tbl_kehadiran VALUES($rekor, $key,'$tanggal','$val', '$muhadir')");
         }
+        $this->session->set_flashdata('success', '<div class="alert alert-success alert-dismissible fade show role="alert"">Berhasil Absen! Silahkan lihat halaman <a href="'.base_url('Absensi/rekor_presensi').'">Rekor Absensi Anggota</a>.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
         redirect();
     }
 
     public function rekor_presensi($id=1){
+         $active_link = $this->uri->segment(2);
 
         $jumlah_data = $this->absensi_model->jumlah_data();
         $config['base_url'] = base_url().'absensi/rekor_presensi/';
@@ -150,7 +194,8 @@ class Absensi extends CI_Controller{
             'data' => $data,
             'absensi' => $absensi,
             'nama' => $anggota[0]['nama'],
-            'rekortgl' => $rekortgl
+            'rekortgl' => $rekortgl,
+            'active' => $active_link
         );
         $this->load->view('rekor_anggota', $data); 
     }

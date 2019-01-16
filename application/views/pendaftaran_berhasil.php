@@ -15,6 +15,7 @@
     <link href="<?php echo base_url('resources/css/style.css') ;?>" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url('resources/css/w3-colors-win8.css')?>">   
     <script src="<?php echo base_url("resources/js/jquery-3.3.1.js"); ?>"></script>
+    <link rel="icon" href="<?php echo base_url('resources/favicon/forsed.jpg') ;?>">
 </head>
 <body>
 	<div class="container">
