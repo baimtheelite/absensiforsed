@@ -26,7 +26,7 @@
 
                 <div class="col-lg-6">
 
-                            <label>Tanggal Pertemuan:</label><input class="form-control" id="date" type="date" name="tanggal" required="">
+                            <label>Tanggal Pertemuan:</label><input id="date" class="form-control" id="date" type="date" name="tanggal" required="">
 
                         </div>
 
@@ -36,7 +36,7 @@
                             <select class="form-control" name="muhadir" required="">
                               <option value="" selected disabled hidden>-Pilih Muhadir- </option>
                               <?php foreach($datamuhadir as $muhadir) { ?>
-                                <option><?= $muhadir['nama_muhadir']; ?></option>
+                                <option id="muhadir[]" value="<?= $muhadir['id_muhadir']; ?>"><?= $muhadir['muhadir']; ?></option>
                               <?php } ?>
                             </select>
                         </div>
@@ -79,9 +79,9 @@
 
                 <td><?=$anggota['nama'];?></td>
 
-                <?="<td><input class='hadir' type='radio' name='hadir[".$anggota['id']."]' value='Hadir' checked disabled></td>"; ?>
+                <?="<td><input class='hadir' type='radio' name='hadir[".$anggota['id']."]' value='Hadir' disabled></td>"; ?>
 
-                <?="<td><input class='alpha' type='radio' name='hadir[".$anggota['id']."]' value='Alpha' disabled></td>"; ?>
+                <?="<td><input class='alpha' type='radio' name='hadir[".$anggota['id']."]' value='Alpha' checked disabled></td>"; ?>
 
               </tr>
 
@@ -129,7 +129,7 @@
 
     </div>
 
-        <button id="kirim" type="submit" class="btn btn-primary" onclick="return confirm('Apakah data Absensi sudah benar?')" disabled>Kirim</button>
+        <button id="kirim" type="submit" class="btn btn-primary" onclick="return confirm('Apakah data absensi sudah benar?\n Jika ragu cek kembali!');" disabled>Kirim</button>
 
       </form>
 

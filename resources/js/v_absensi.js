@@ -48,4 +48,11 @@
 
          })
 
+         var konfirmasi= function(){
+            var tanggal = $("#date").val();
+            var muhadir = $("#muhadir").val();
+
+           return confirm("Apakah data absensi sudah benar?\nTanggal: "+tanggal+"\n Muhadir: "+muhadir);
+         };
+
       });

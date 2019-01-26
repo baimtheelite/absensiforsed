@@ -7,7 +7,7 @@
 	<div class="container-fluid">
 		<div class="row">
         <div class="col-lg-6">
-            <div class="card " style="padding: 8px;">
+            <div class="card rekoranggota" style="padding: 8px;">
             	<div class="card-header bg-primary">
 		            <h2 class="text-center text-light">Rekor Anggota</h2>
 		        </div>
@@ -60,7 +60,7 @@
            			<?php foreach ($rekortgl as $rekor) {?>
            			<tr>
            				<td><?=$no; ?>.</td>
-           				<td><?=$rekor['tanggal']; ?></td>
+           				<td><?=$rekor['tgl']; ?></td>
            				<td><?=$rekor['muhadir']; ?></td>
            				<td><a class="btn btn-primary" href="<?=base_url('Absensi/rekor_tanggal/').$rekor['id_tgl']; ?>">Lihat</a></td>
            			</tr>
@@ -92,7 +92,7 @@
 									<td><?=$anggota['nama']; ?></td>
 									<td><?=$anggota['Jumlah_Hadir']; ?></td>
 									<td><?=$anggota['tanggal']?></td>
-									<td><a class="btn btn-primary" href="<?php echo base_url().'index.php/Absensi/rekor_presensi/'.$anggota['id']; ?>">Lihat</a></td>
+									<td><a href="<?= site_url('Absensi/rekor_presensi/'.$anggota['id']) ?>" class="lihat_data btn btn-primary" id="<?=$anggota['id']; ?>">Lihat</a></td>
 								</tr>
 								<?php $no++; ?>
 							<?php } ?>
@@ -101,5 +101,45 @@
     				</div>
     			</div>
     		</div>
-    		
+    		 
+    		 <!-- MODAL VIEW REKOR ANGGOTA -->
+    		 <!-- The Modal -->
+			<div class="modal" id="dataModal">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+
+			      <!-- Modal Header -->
+			      <div class="modal-header">
+			        <h4 class="modal-title">Rekor Anggota</h4>
+			        <button type="button" class="close" data-dismiss="modal">&times;</button>
+			      </div>
+
+			      <!-- Modal body -->
+			      <div class="modal-body">
+			        
+			        <div id="absensi_result"></div>
+
+			      </div>
+
+			      <!-- Modal footer -->
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+			      </div>
+
+			    </div>
+			  </div>
+			</div>
+
+			<script>
+				$(document).ready(function(){
+					$('html, body').animate({
+					scrollTop: $(".rekoranggota").offset().top
+				}, 500, function(){
+					$(".rekoranggota").fadeOut(300, function(){
+						$(this).fadeIn(300);
+					})
+				});
+					
+				});
+			</script>
  <?php $this->load->view('partial/modal_pendaftaran'); ?>

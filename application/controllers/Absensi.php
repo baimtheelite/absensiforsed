@@ -4,6 +4,7 @@ class Absensi extends CI_Controller{
     public function __construct(){
         parent::__construct();
         $this->load->model('absensi_model');
+        $this->load->library('pdf');
 
         $active_link = $this->uri->segment(2);
     }
@@ -56,25 +57,27 @@ class Absensi extends CI_Controller{
 
         if(isset($_GET['carinama'])) {
             $nama = $this->input->get('carinama');
-            $data = $this->absensi_model->query('SELECT * FROM tbl_anggota WHERE nama LIKE "%'.$nama.'%"');
+            $datamuhadir = $this->absensi_model->GetAnggota('tbl_muhadir');
+            $dataanggota = $this->absensi_model->query('SELECT * FROM tbl_anggota WHERE nama LIKE "%'.$nama.'%"');
             $array = array(
-                    'data' => $data,
+                    'dataanggota' => $dataanggota,
+                    'datamuhadir' => $datamuhadir,
                     'nama' => $nama,
                     'active' => $active_link
                  );
         $this->load->view('daftar_anggota', $array);
 
         }else{
-        $data = $this->absensi_model->query('SELECT * FROM tbl_anggota ORDER BY nama');
+        $dataanggota = $this->absensi_model->query('SELECT * FROM tbl_anggota ORDER BY nama');
+        $datamuhadir = $this->absensi_model->GetAnggota('tbl_muhadir');
         $array = array(
-                    'data' => $data,
+                    'dataanggota' => $dataanggota,
+                    'datamuhadir' => $datamuhadir,
                     'active' => $active_link
                  );
         $this->load->view('daftar_anggota', $array);
         }       
     }
-
-
 
     public function pendaftaran(){
         $this->load->view('pendaftaran_anggota');
@@ -105,7 +108,7 @@ class Absensi extends CI_Controller{
      if (isset($_POST['insertmuhadir'])) {
          $namamuhadir = $this->input->post('namamuhadir');
          $data = array(
-            'nama_muhadir' => $namamuhadir
+            'muhadir' => $namamuhadir
          );
          $id = $this->absensi_model->Insert('tbl_muhadir', $data);
 
@@ -119,10 +122,20 @@ class Absensi extends CI_Controller{
     }
 
         public function delete($id){
-        $id = array('id' => $id);
+        $id = array(
+            'id' => $id
+        );
         $this->absensi_model->Delete('tbl_anggota', $id);
         redirect(site_url('Absensi/daftar_anggota'));
     }
+
+        public function deletemuhadir($id){
+            $id = array(
+            'id_muhadir' => $id
+        );
+        $this->absensi_model->Delete('tbl_muhadir', $id);
+        redirect(site_url('Absensi/daftar_anggota'));
+        }
 
     public function profil($id){
         $anggota = $this->absensi_model->GetWhere('tbl_anggota', array('id' => $id));
@@ -186,7 +199,13 @@ class Absensi extends CI_Controller{
 
         $absensi = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal FROM tbl_anggota a, tbl_kehadiran b WHERE a.id=$id AND b.id=$id");
 
-        $rekortgl = $this->absensi_model->query("SELECT DISTINCT(id_tgl), DATE_FORMAT(tanggal,'%d %M %Y') as tanggal, muhadir FROM tbl_kehadiran");
+        $rekortgl = $this->absensi_model->query("SELECT DISTINCT tbl_kehadiran.id_tgl, DATE_FORMAT(tanggal, '%d %M %Y') AS tgl,
+                                                tbl_muhadir.muhadir AS muhadir, tbl_kehadiran.id_muhadir AS id_muhadir 
+                                                FROM tbl_kehadiran 
+                                                INNER JOIN tbl_muhadir 
+                                                ON tbl_kehadiran.id_muhadir = tbl_muhadir.id_muhadir 
+                                                ORDER BY tanggal ASC "
+                                            );
 
        $anggota = $this->absensi_model->GetWhere('tbl_anggota', array('id' => $id));
 
@@ -197,11 +216,29 @@ class Absensi extends CI_Controller{
             'rekortgl' => $rekortgl,
             'active' => $active_link
         );
+
+        //$absensiData = $this->input->post('')
         $this->load->view('rekor_anggota', $data); 
+    }
+
+    public function presensi_ajax($id = 0){
+        $id = $this->input->get('id');
+        if(isset($id)){
+            $absensi = $this->absensi_model->qry("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal FROM tbl_anggota a, tbl_kehadiran b WHERE a.id=$id AND b.id=$id");
+            return $absensi->result_array();
+        }
+            echo json_encode($absensi);
     }
     
         public function rekor_tanggal($id){
-        $data = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal FROM tbl_anggota , tbl_kehadiran where tbl_anggota.id = tbl_kehadiran.id AND id_tgl = $id order by nama");
+        $data = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal 
+                                            FROM tbl_anggota , tbl_kehadiran 
+                                            INNER JOIN tbl_muhadir
+                                            ON tbl_muhadir.id_muhadir = tbl_kehadiran.id_muhadir
+                                            where tbl_anggota.id = tbl_kehadiran.id AND id_tgl = $id  
+                                            order by nama asc"
+                                        );
+
         $not = $this->absensi_model->query("SELECT id, nama FROM tbl_anggota WHERE id NOT IN(SELECT id FROM tbl_kehadiran WHERE id_tgl = $id) ORDER BY nama"); 
         
         $data = array(
@@ -213,5 +250,84 @@ class Absensi extends CI_Controller{
             );
             
         $this->load->view('rekor_tanggal', $data);
+    }
+
+    public function cetak_laporan_absensi(){
+        
+        $pdf = new FPDF('l', 'mm', 'A4');
+        //Membuat Halaman Baru
+        $pdf->AddPage();
+        //setting jenis font yang akan digunakan
+        $pdf->SetFont('Arial', 'B', '16');
+        // mencetak string
+        $pdf->Cell(190,7,'CETAK LAPORAN ABSENSI PENGAJIAN IRMA',0,1,'C');
+        $pdf->SetFont('Arial', 'B', '12');
+        $pdf->Cell(190,7,'PENGAJIAN RUTIN IRMA SEKTOR DUA',0,1,'C');
+        //Memberikan space ke bawah agar tidak terlalu rapat
+        $bulan = 0;
+        $pdf->Cell(190,7,'REKAPITULASI REKOR KEHADIRAN ANGGOTA',0,1,'C');
+        $rekoranggota = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') AS tanggal, COUNT(tbl_kehadiran.id) AS Jumlah_Hadir 
+        FROM tbl_anggota, tbl_kehadiran 
+        WHERE tbl_anggota.id = tbl_kehadiran.id AND tbl_kehadiran.hadir = 'Hadir' 
+        GROUP BY tbl_anggota.id 
+        ORDER BY Jumlah_Hadir DESC");
+
+        $pdf->Cell(10,7,'',0,1);
+        $pdf->SetFont('Arial','B',10);
+        $no = 1;
+        $pdf->Cell(15,6,'NO',1,0);
+        $pdf->Cell(85,6,'NAMA',1,0);
+        $pdf->Cell(35,6,'JUMLAH HADIR',1,0);
+        $pdf->SetFont('Arial','',10);
+        $pdf->Cell(10,7,'',0,1);
+        foreach ($rekoranggota as $row) {
+                        $pdf->Cell(15,6,$no,1,0);
+                        $pdf->Cell(85,6,$row['nama'],1,0);
+                        $pdf->Cell(35,6,$row['Jumlah_Hadir'],1,1);
+                        $no++;
+        }
+
+        for ($tahun = 2018; $tahun <= 2019 ; $tahun++) { 
+            for($bulan = 1; $bulan <= 12; $bulan++){
+                  $anggota = $this->db->query('SELECT nama, DATE_FORMAT(tanggal, "%d %M %Y") as tanggal, hadir
+                                            FROM tbl_kehadiran
+                                            INNER JOIN tbl_anggota 
+                                            ON tbl_kehadiran.id = tbl_anggota.id
+                                            WHERE MONTH(tanggal) = '.$bulan.' AND YEAR(tanggal) ='.$tahun.'
+                                            ORDER BY id_tgl ASC, nama ASC');
+
+                if($anggota->num_rows() > 0){
+                $month = $this->db->query('SELECT DISTINCT MONTHNAME(tanggal) as bulan from tbl_kehadiran WHERE MONTH(tanggal) = '.$bulan)->result_array();
+                foreach ($month as $key) {
+                    $pdf->SetFont('Arial', 'B', '12');
+                    $pdf->Cell(190,7,'Bulan: '. $key['bulan'].', '.$tahun ,0,1,'C');
+                }
+                
+                    $pdf->Cell(10,7,'',0,1);
+                    $pdf->SetFont('Arial','B',10);
+                    $no = 1;
+                    $pdf->Cell(15,6,'NO',1,0);
+                    $pdf->Cell(85,6,'NAMA',1,0);
+                    $pdf->Cell(35,6,'TANGGAL',1,0);
+                    $pdf->Cell(25,6,'KEHADIRAN',1,1);
+                    $pdf->SetFont('Arial','',10);
+                    // $anggota = $this->db->query('SELECT nama, DATE_FORMAT(tanggal, "%d %M %Y") as tanggal, hadir
+                    //                              FROM tbl_kehadiran 
+                    //                              INNER JOIN tbl_anggota 
+                    //                              ON tbl_kehadiran.id = tbl_anggota.id 
+                    //                              ORDER BY id_tgl ASC, nama ASC'
+                    //
+                                          // )->result();
+                    foreach ($anggota->result() as $row) {
+                        $pdf->Cell(15,6,$no,1,0);
+                        $pdf->Cell(85,6,$row->nama,1,0);
+                        $pdf->Cell(35,6,$row->tanggal,1,0);
+                        $pdf->Cell(25,6,$row->hadir,1,1);
+                        $no++;
+                    }
+                }
+            }
+        }
+            $pdf->Output('Laporan Absensi Pengantin.pdf', 'I');
     }
 }

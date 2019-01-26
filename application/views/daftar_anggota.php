@@ -5,8 +5,22 @@
 	</div>
 	<div class="container">
 		<div class="row">
+			
 			<div class="col-lg-12">
-				<form method="GET" class="card card-sm" action="<?= base_url('Absensi/daftar_anggota'); ?>">
+				<!-- Nav tabs -->
+					
+					<ul class="nav nav-pills">
+					  <li class="nav-item">
+					    <a class="nav-link active" data-toggle="tab" href="#daftaranggota">List Anggota</a>
+					  </li>
+					  <li class="nav-item">
+					    <a class="nav-link" data-toggle="tab" href="#daftarmuhadir">List Muhadir</a>
+					  </li>
+					</ul>
+					<!-- Tab panes -->
+					<div class="tab-content">
+					  <div class="tab-pane container active" id="daftaranggota">
+					  		<form method="GET" class="card card-sm" action="<?= base_url('Absensi/daftar_anggota'); ?>">
                                 <div class="card-body row no-gutters align-items-center">
                                     <div class="col-auto">
                                         <i class="fas fa-search h4 text-body"></i>
@@ -37,7 +51,7 @@
 						</thead>
 						<tbody>
 							<?php $no = 1; ?>
-							<?php foreach ($data as $anggota) { ?>
+							<?php foreach ($dataanggota as $anggota) { ?>
 								<tr>
 									<td><?=$no.".";?></td>
 									<td><?=$anggota['nama']; ?></td>
@@ -49,8 +63,34 @@
 							<?php } ?>
 						</tbody>
 					</table>
-					</div>
 				</div>
+					  </div>
+					  <div class="tab-pane container fade" id="daftarmuhadir">
+					  	<div class="table-responsive card">
+					<table class="table text-center">
+						<thead>
+							<tr>
+								<th>No</th>
+								<th>Nama</th>
+								<th>Aksi</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php $no = 1; ?>
+							<?php foreach ($datamuhadir as $muhadir) { ?>
+								<tr>
+									<td><?=$no.".";?></td>
+									<td><?=$muhadir['muhadir']; ?></td>
+									<td><a class="btn btn-danger" href="<?php echo base_url().'index.php/Absensi/deletemuhadir/'.$muhadir['id_muhadir']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus <?= $muhadir['muhadir']; ?>?')" >Hapus</a></td>
+								</tr>
+								<?php $no++; ?>
+							<?php } ?>
+						</tbody>
+					</table>
+				</div>
+					  </div>
+					</div>
 			</div>
+		</div>
 
   <?php $this->load->view('partial/modal_pendaftaran'); ?>
