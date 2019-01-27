@@ -19,13 +19,18 @@
 
       <!-- Modal body -->
       <div class="modal-body">
+      				<?php echo validation_errors(); ?>					
         <div class="tab-content" id="pills-tabContent">
+        
+        <!-- TAB ANGGOTA -->
           <div class="tab-pane fade show active" id="pills-anggota" role="tabpanel" aria-labelledby="pills-anggota-tab">
-            <form method="post" action="<?php echo site_url('Absensi/insert'); ?>">
+            <!-- <form method="post" action="<?php  // echo site_url('Absensi/insert'); ?>"> -->
+            <?= form_open_multipart('Absensi/insert') ?>
         <div class="form-group">
             <label for="Nama">Nama</label>
-            <input name="nama" type="text" class="form-control" id="nama" autofocus>
-          </div>
+            	<?= form_input('nama', set_value(''), 'class="form-control" id="nama" autofocus'); ?>	
+            <!-- <input name="nama" type="text" class="form-control" id="nama" autofocus> -->
+        </div>
           <div class="form-group">
             <label for="alamat">Alamat</label><br>
             <label class="radio-inline"><input type="radio" name="alamat" value="RT 01">RT 01</label>
@@ -34,19 +39,32 @@
           </div>
         <div class="form-group">
             <label for="notelp">No Telp</label>
-            <input name="notelp" type="text" class="form-control" id="notelp">
-          </div>
+            <!-- <input name="notelp" type="text" class="form-control" id="notelp"> -->
+            <?= form_input('notelp', NULL, 'class="form-control" id="notelp"'); ?>	
+        </div>
+        <div class="form-group">
+          <label for="foto">Upload Photo</label>
+						<?= form_upload('foto', NULL, 'class="form-control" id="foto"'); ?>
+
+        </div>
           <button name="insertanggota" type="submit" class="btn btn-primary">Submit</button>
+            <?= form_reset('reset', 'Reset', 'class="btn btn-danger"'); ?>
+
           </div>
 
+          <!-- TAB MUHADIR -->
           <div class="tab-pane fade" id="pills-muhadir" role="tabpanel" aria-labelledby="pills-muhadir-tab">
-            <form method="post" action="<?php echo site_url('Absensi/insert'); ?>">
+            <form method="post" action="<?= site_url('Absensi/insert'); ?>">
               <div class="form-group">
                 <label for="namamuhadir">Nama Muhadir</label>
-                  <input type="text" name="namamuhadir" class="form-control" id="namamuhadir autofocus">
+                  <!-- <input type="text" name="namamuhadir" class="form-control" id="namamuhadir autofocus"> -->
+                  <?= form_input('namamuhadir', NULL, 'class="form-control" id="namamuhadir" autofocus'); ?>	
+
               </div>
               <button name="insertmuhadir" type="submit" class="btn btn-primary">Submit</button>
-            </form>
+            <!-- </form> -->
+            <?= form_reset('reset', 'Reset'); ?>
+            <?= form_close(); ?>
           </div>
         </div>
       </div>

@@ -34,27 +34,30 @@
 		</div>
         <div class="row">
             <div class="col-lg-6">
-            <form method="post" action="<?php echo base_url('index.php/Absensi/update'); ?>">
-                <input type="hidden" name="id" value="<?php echo $id; ?>">
-            <div class="form-group">
-                <label for="Nama">Nama</label>
-                <input name="nama" type="text" class="form-control col-sm-7 enable" id="nama" value="<?=$nama; ?>"disabled>
-            </div>
-            <div class="form-group">
-                <label for="alamat">Alamat</label><br>
-                <label class="radio-inline"><input class="enable" type="radio" name="alamat" value="RT 01" disabled<?php echo set_radio('alamat', 'RT 01', ($alamat == "RT 01")? true : false); ?>>RT 01</label>
-                <label class="radio-inline"><input class="enable" type="radio" name="alamat" value="RT 02" disabled<?php echo set_radio('alamat', 'RT 02', ($alamat == "RT 02")? true : false); ?>>RT 02</label>
-                <label class="radio-inline"><input class="enable" type="radio" name="alamat" value="RT 03" disabled<?php echo set_radio('alamat', 'RT 03', ($alamat == "RT 03")? true : false); ?>>RT 03</label>
-            </div>
-            <div class="form-group">
-                <label for="notelp">No Telp</label>
-                <input name="notelp" type="text" class="form-control col-sm-5 enable" id="notelp" value="<?=$notelp; ?>" disabled>
-            </div>      
-                <button id="kirim" type="submit" class="btn btn-primary enable" disabled>Submit</button> &nbsp;
-                <span id="ubah">Ubah Data?</span>  
-            </form>
-        <a class="btn btn-info" href="<?= site_url('Absensi/daftar_anggota'); ?>" style="margin-top: 32px">Kembali</a>         
-        </div>
+                <div class="text-center">
+                    <img class="rounded-circle" src="<?= base_url('uploads/'. $foto); ?>" alt="">
+                </div>
+                <form method="post" action="<?php echo base_url('index.php/Absensi/update'); ?>">
+                    <input type="hidden" name="id" value="<?php echo $id; ?>">
+                <div class="form-group">
+                    <label for="Nama">Nama</label>
+                    <input name="nama" type="text" class="form-control col-sm-7 enable" id="nama" value="<?=$nama; ?>"disabled>
+                </div>
+                <div class="form-group">
+                    <label for="alamat">Alamat</label><br>
+                    <label class="radio-inline"><input class="enable" type="radio" name="alamat" value="RT 01" disabled<?php echo set_radio('alamat', 'RT 01', ($alamat == "RT 01")? true : false); ?>>RT 01</label>
+                    <label class="radio-inline"><input class="enable" type="radio" name="alamat" value="RT 02" disabled<?php echo set_radio('alamat', 'RT 02', ($alamat == "RT 02")? true : false); ?>>RT 02</label>
+                    <label class="radio-inline"><input class="enable" type="radio" name="alamat" value="RT 03" disabled<?php echo set_radio('alamat', 'RT 03', ($alamat == "RT 03")? true : false); ?>>RT 03</label>
+                </div>
+                <div class="form-group">
+                    <label for="notelp">No Telp</label>
+                    <input name="notelp" type="text" class="form-control col-sm-5 enable" id="notelp" value="<?=$notelp; ?>" disabled>
+                </div>      
+                    <button id="kirim" type="submit" class="btn btn-primary enable" disabled>Submit</button> &nbsp;
+                    <span id="ubah">Ubah Data?</span>  
+                </form>
+                <a class="btn btn-info" href="<?= site_url('Absensi/daftar_anggota'); ?>" style="margin-top: 32px">Kembali</a>         
+             </div>
         <div class="col-lg-6">
             <h2 class="text-center">Absensi</h2>            
                <table class="table">

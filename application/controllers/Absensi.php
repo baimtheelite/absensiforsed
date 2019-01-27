@@ -14,6 +14,7 @@ class Absensi extends CI_Controller{
                 $data       = $this->absensi_model->query('SELECT * FROM tbl_anggota ORDER BY nama');
                 $datamuhadir = $this->absensi_model->GetAnggota('tbl_muhadir');
                 $max         = $this->absensi_model->max('tbl_kehadiran', 'id_tgl');
+                $admin       = $this->session->userdata('nama');
 
                 $active_link = '';
 
@@ -21,7 +22,8 @@ class Absensi extends CI_Controller{
                     'data' => $data,
                     'max' => ($max[0]['id_tgl'] + 1),
                     'datamuhadir' => $datamuhadir,
-                    'active' => $active_link
+                    'active' => $active_link,
+                    'admin' => $admin
                  );
 
                 $this->load->view('v_absensi', $arr);
@@ -37,8 +39,13 @@ class Absensi extends CI_Controller{
         $query = $this->absensi_model->LoginAdmin($user, md5($password));
         if($query->num_rows() > 0){
             foreach($query->result() as $data){
-            $this->session->set_userdata('user', $data->user);
-            $nama = $data->user;
+                $session = array(
+                    'user'  => $data->user,
+                    'nama'  => $data->nama_user
+                );
+                $this->session->set_userdata($session);
+                $nama = $data->nama_user;
+                echo $nama;
         }
             $this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible fade show role="alert"">Berhasil login! Selamat Datang '.ucfirst($nama).'! <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
             redirect('/', 'refresh');
@@ -48,12 +55,13 @@ class Absensi extends CI_Controller{
  }
 
     public function logout(){
-        $this->session->unset_userdata('user');
+        $this->session->unset_userdata(array('user', 'nama'));
         redirect(base_url('Absensi/index'));
     }
 
     public function daftar_anggota(){
         $active_link = $this->uri->segment(2);
+        $admin       = $this->session->userdata('nama');
 
         if(isset($_GET['carinama'])) {
             $nama = $this->input->get('carinama');
@@ -73,7 +81,8 @@ class Absensi extends CI_Controller{
         $array = array(
                     'dataanggota' => $dataanggota,
                     'datamuhadir' => $datamuhadir,
-                    'active' => $active_link
+                    'active' => $active_link,
+                    'admin'=> $admin
                  );
         $this->load->view('daftar_anggota', $array);
         }       
@@ -85,27 +94,55 @@ class Absensi extends CI_Controller{
 
     public function insert(){
         if(isset($_POST['insertanggota'])){
-         $data = array(
-            'nama' => $this->input->post('nama'),
-            'alamat' => $this->input->post('alamat'),
-            'notelp' => $this->input->post('notelp')
-             );
-         
-         $nama = $_POST['nama'];
-         $alamat = $_POST['alamat'];
-         $notelp = $_POST['notelp'];
+            $this->form_validation->set_rules('nama', 'Nama', 'required');
+            $this->form_validation->set_rules('alamat', 'Alamat', 'required');
+            $this->form_validation->set_rules('notelp'. 'Nomor Telepon', 'required|numeric');
 
-         $summary = array(
-            'nama' => $nama,
-            'alamat' => $alamat,
-            'notelp' => $notelp
-         );
+            if($this->form_validation->run() === TRUE){
+                $data['nama']   = $this->input->post('nama');
+                $data['alamat'] = $this->input->post('alamat');
+                $data['notelp'] = $this->input->post('notelp');
 
-        $this->load->view('pendaftaran_berhasil', $summary);
-         $this->absensi_model->Insert('tbl_anggota', $data);
+                $config['upload_path']          = './uploads/';
+                $config['allowed_types']        = 'gif|jpg|png';
+                $config['max_size']             = 100;
+                $config['max_width']            = 1024;
+                $config['max_height']           = 768;
+
+                $this->load->library('upload', $config);
+                if (!empty($_FILES['foto']['name'])){ 
+                if(!$this->upload->do_upload('foto')){
+                  echo $this->upload->display_errors();
+                }
+                else{
+                  $data['foto'] = $this->upload->data()['file_name'];
+                }
+            }else{
+                   $data['foto'] = "user_default.jpg";
+            }
+                // $data = array(
+                    //     'nama' => $this->input->post('nama'),
+                    //     'alamat' => $this->input->post('alamat'),
+                    //     'notelp' => $this->input->post('notelp')
+                    //     );
+            
+            $nama = $_POST['nama'];
+            $alamat = $_POST['alamat'];
+            $notelp = $_POST['notelp'];
+            
+            $summary = array(
+                'nama' => $nama,
+                'alamat' => $alamat,
+                'notelp' => $notelp
+            );
+            
+            $id = $this->absensi_model->Insert('tbl_anggota', $data);
+            if($id)
+            $this->load->view('pendaftaran_berhasil', $summary);
+        }
      }
 
-     if (isset($_POST['insertmuhadir'])) {
+     if(isset($_POST['insertmuhadir'])) {
          $namamuhadir = $this->input->post('namamuhadir');
          $data = array(
             'muhadir' => $namamuhadir
@@ -121,7 +158,7 @@ class Absensi extends CI_Controller{
         // redirect(site_url('Absensi'));
     }
 
-        public function delete($id){
+    public function delete($id){
         $id = array(
             'id' => $id
         );
@@ -129,22 +166,25 @@ class Absensi extends CI_Controller{
         redirect(site_url('Absensi/daftar_anggota'));
     }
 
-        public function deletemuhadir($id){
-            $id = array(
+    public function deletemuhadir($id){
+        $id = array(
             'id_muhadir' => $id
         );
         $this->absensi_model->Delete('tbl_muhadir', $id);
         redirect(site_url('Absensi/daftar_anggota'));
-        }
+    }
 
     public function profil($id){
         $anggota = $this->absensi_model->GetWhere('tbl_anggota', array('id' => $id));
-        $absensi = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d-%M-%Y') as tanggal FROM tbl_anggota a, tbl_kehadiran b WHERE a.id=$id AND b.id=$id");
+        $absensi = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d-%M-%Y') as tanggal 
+                                                FROM tbl_anggota a, tbl_kehadiran b 
+                                                WHERE a.id=$id AND b.id=$id");
         $data = array(
             'id' => $anggota[0]['id'],
             'nama' => $anggota[0]['nama'],
             'alamat' => $anggota[0]['alamat'],
             'notelp' => $anggota[0]['notelp'],
+            'foto' => $anggota[0]['foto'],
             'absensi' => $absensi
             );
         $this->load->view('profil_anggota', $data); 
@@ -186,19 +226,28 @@ class Absensi extends CI_Controller{
     }
 
     public function rekor_presensi($id=1){
-         $active_link = $this->uri->segment(2);
+        $active_link = $this->uri->segment(2);
+        $admin       = $this->session->userdata('nama');
 
-        $jumlah_data = $this->absensi_model->jumlah_data();
-        $config['base_url'] = base_url().'absensi/rekor_presensi/';
-        $config['total_rows'] = $jumlah_data;
-        $config['per_page'] = 25;
-        $from = $this->uri->segment(2);
-        $this->pagination->initialize($config);
 
-        $data = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal, COUNT(tbl_kehadiran.id) as Jumlah_Hadir FROM tbl_anggota, tbl_kehadiran WHERE tbl_anggota.id = tbl_kehadiran.id AND tbl_kehadiran.hadir = 'Hadir' GROUP BY tbl_anggota.id ORDER BY Jumlah_Hadir DESC");
-
-        $absensi = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal FROM tbl_anggota a, tbl_kehadiran b WHERE a.id=$id AND b.id=$id");
-
+        //REKOR ABSENSI TERTINGGI KE TERENDAH
+        $data = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal, COUNT(tbl_kehadiran.id) as Jumlah_Hadir 
+                                             FROM tbl_anggota, tbl_kehadiran
+                                             WHERE tbl_anggota.id = tbl_kehadiran.id AND tbl_kehadiran.hadir = 'Hadir' 
+                                             GROUP BY tbl_anggota.id 
+                                             ORDER BY Jumlah_Hadir DESC");
+        //REKOR ABSENSI KEHADIRAN ANGGOTA TERTINGGI
+        $max = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal, COUNT(tbl_kehadiran.id) as Jumlah_Hadir 
+                                             FROM tbl_anggota, tbl_kehadiran
+                                             WHERE tbl_anggota.id = tbl_kehadiran.id AND tbl_kehadiran.hadir = 'Hadir' 
+                                             GROUP BY tbl_anggota.id 
+                                             ORDER BY Jumlah_Hadir DESC
+                                             LIMIT 1");                                     
+        //REKOR KEHADIRAN ANGGOTA
+        $absensi = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal 
+                                                FROM tbl_anggota a, tbl_kehadiran b 
+                                                WHERE a.id=$id AND b.id=$id");
+        //REKOR BERDASARKAN TANGGAL
         $rekortgl = $this->absensi_model->query("SELECT DISTINCT tbl_kehadiran.id_tgl, DATE_FORMAT(tanggal, '%d %M %Y') AS tgl,
                                                 tbl_muhadir.muhadir AS muhadir, tbl_kehadiran.id_muhadir AS id_muhadir 
                                                 FROM tbl_kehadiran 
@@ -214,7 +263,9 @@ class Absensi extends CI_Controller{
             'absensi' => $absensi,
             'nama' => $anggota[0]['nama'],
             'rekortgl' => $rekortgl,
-            'active' => $active_link
+            'max' => $max[0],
+            'active' => $active_link,
+            'admin' => $admin
         );
 
         //$absensiData = $this->input->post('')
@@ -230,7 +281,7 @@ class Absensi extends CI_Controller{
             echo json_encode($absensi);
     }
     
-        public function rekor_tanggal($id){
+    public function rekor_tanggal($id){
         $data = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal 
                                             FROM tbl_anggota , tbl_kehadiran 
                                             INNER JOIN tbl_muhadir
