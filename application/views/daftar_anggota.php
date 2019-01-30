@@ -5,10 +5,9 @@
 	</div>
 	<div class="container">
 		<div class="row">
-			
+			<?= $this->session->flashdata('update_success'); ?>
 			<div class="col-lg-12">
-				<!-- Nav tabs -->
-					
+				<!-- Nav tabs -->					
 					<ul class="nav nav-pills">
 					  <li class="nav-item">
 					    <a class="nav-link active" data-toggle="tab" href="#daftaranggota">List Anggota</a>
@@ -19,78 +18,63 @@
 					</ul>
 					<!-- Tab panes -->
 					<div class="tab-content">
-					  <div class="tab-pane container active" id="daftaranggota">
-					  		<form method="GET" class="card card-sm" action="<?= base_url('Absensi/daftar_anggota'); ?>">
-                                <div class="card-body row no-gutters align-items-center">
-                                    <div class="col-auto">
-                                        <i class="fas fa-search h4 text-body"></i>
-                                    </div>
-                                    <!--end of col-->
-                                    <div class="col">
-                                        <input name="carinama" class="form-control form-control-lg form-control-borderless" type="text" placeholder="Cari nama anggota">
-                                    </div>
-                                    <!--end of col-->
-                                    <div class="col-auto">
-                                        <button class="btn btn-lg btn-primary" type="submit">Search</button>
-                                    </div>
-                                    <!--end of col-->
-                                </div>
-                            </form>
-                            <?php if($this->input->get('carinama')){ ?>
-                            <h3>Hasil pencarian: <?= $nama; ?></h3>
-                        <?php } ?>
-			    <div class="table-responsive card">
-					<table class="table text-center">
-						<thead>
-							<tr>
-								<th>No</th>
-								<th>Nama</th>
-								<th>Alamat</th>
-								<th colspan="2">Aksi</th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php $no = 1; ?>
-							<?php foreach ($dataanggota as $anggota) { ?>
-								<tr>
-									<td><?=$no.".";?></td>
-									<td><?=$anggota['nama']; ?></td>
-									<td><?=$anggota['alamat']; ?></td>
-									<td><a class="btn btn-primary" href="<?php echo base_url().'index.php/Absensi/profil/'.$anggota['id']; ?>">Buka</a></td>
-									<td><a class="btn btn-danger" href="<?php echo base_url().'index.php/Absensi/delete/'.$anggota['id']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus <?= $anggota['nama']; ?>?')" >Hapus</a></td>
-								</tr>
-								<?php $no++; ?>
-							<?php } ?>
-						</tbody>
-					</table>
-				</div>
+					 <div class="tab-pane container active" id="daftaranggota">
+						<div class="table-responsive card">
+							<table class="table text-center daftaranggota">
+								<thead>
+									<tr>
+										<th>No</th>
+										<th>Nama</th>
+										<th>Alamat</th>
+										<th colspan="2">Aksi</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php $no = 1; ?>
+									<?php foreach ($dataanggota as $anggota) { ?>
+										<tr>
+											<td><?=$no.".";?></td>
+											<td><?=$anggota['nama']; ?></td>
+											<td><?=$anggota['alamat']; ?></td>
+											<td><a class="btn btn-primary" href="<?php echo base_url().'index.php/Absensi/profil/'.$anggota['id']; ?>">Buka</a></td>
+											<td><a class="btn btn-danger" href="<?php echo base_url().'index.php/Absensi/delete/'.$anggota['id']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus <?= $anggota['nama']; ?>?')" >Hapus</a></td>
+										</tr>
+										<?php $no++; ?>
+									<?php } ?>
+								</tbody>
+							</table>
+						</div>
 					  </div>
 					  <div class="tab-pane container fade" id="daftarmuhadir">
 					  	<div class="table-responsive card">
-					<table class="table text-center">
-						<thead>
-							<tr>
-								<th>No</th>
-								<th>Nama</th>
-								<th>Aksi</th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php $no = 1; ?>
-							<?php foreach ($datamuhadir as $muhadir) { ?>
-								<tr>
-									<td><?=$no.".";?></td>
-									<td><?=$muhadir['muhadir']; ?></td>
-									<td><a class="btn btn-danger" href="<?php echo base_url().'index.php/Absensi/deletemuhadir/'.$muhadir['id_muhadir']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus <?= $muhadir['muhadir']; ?>?')" >Hapus</a></td>
-								</tr>
-								<?php $no++; ?>
-							<?php } ?>
-						</tbody>
-					</table>
-				</div>
+							<table class="table text-center">
+								<thead>
+									<tr>
+										<th>No</th>
+										<th>Nama</th>
+										<th>Aksi</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php $no = 1; ?>
+									<?php foreach ($datamuhadir as $muhadir) { ?>
+										<tr>
+											<td><?=$no.".";?></td>
+											<td><?=$muhadir['muhadir']; ?></td>
+											<td><a class="btn btn-danger" href="<?php echo base_url().'index.php/Absensi/deletemuhadir/'.$muhadir['id_muhadir']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus <?= $muhadir['muhadir']; ?>?')" >Hapus</a></td>
+										</tr>
+										<?php $no++; ?>
+									<?php } ?>
+								</tbody>
+							</table>
+						</div>
 					  </div>
 					</div>
 			</div>
 		</div>
-
+		<script>
+			$(document).ready(function(){
+				$('.daftaranggota').dataTable();
+			})
+		</script>
   <?php $this->load->view('partial/modal_pendaftaran'); ?>

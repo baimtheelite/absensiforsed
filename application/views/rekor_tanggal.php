@@ -46,10 +46,13 @@
 
 	    <div class="pull-right" style="margin-bottom: 10px;">
 
-	        <a class="btn btn-info" href="<?=site_url('Absensi/rekor_presensi'); ?>">Kembali</a>
+	        <button id="ubah-absensi" class="btn btn-info">Ubah data absensi?</button>
 
 	    </div>
+	<?= form_open('Absensi/update/'.$pertemuan); ?>
 
+	<?= form_hidden('idtgl', $pertemuan) ; ?>
+	
 	<table class="table">
 
 		<thead>
@@ -76,10 +79,15 @@
 
 				<td><?=$rekortgl['nama']; ?></td>
 
-				<td><span class="text-danger"><?=$rekortgl['hadir']; ?></span><?php $alpha++; ?></td>
+				<td>
+				<select disabled class="enable" name="kehadiran[<?= $rekortgl['id'] ?>]" >
+					<option value="Alpha" <?= set_select('kehadiran', 'Alpha', TRUE); ?> >Alpha</option>
+					<option value="Hadir">Hadir</option>
+				</select>
+				</td>
 
 			</tr>
-
+				<?php $alpha++; ?>
 			<?php } else{ ?>
 
 			<tr>
@@ -88,8 +96,13 @@
 
 				<td><?=$rekortgl['nama']; ?></td>
 
-				<td><?=$rekortgl['hadir']; $hadir++; ?></td>
+				<td>
+				<select disabled class="enable" name="kehadiran[<?= $rekortgl['id'] ?>]">
+					<option value="Alpha" >Alpha</option>
+					<option value="Hadir" <?= set_select('kehadiran', 'Alpha', TRUE); ?>>Hadir</option>
+				</select></td>
 
+				<?php $hadir++; ?>
 			<?php } ?>
 
 			<?php $no++; ?>
@@ -98,7 +111,10 @@
 
 		</tbody>
 
+
 	</table>
+	<button name='updateabsen' type='submit' class='btn btn-primary enable' disabled>Update Absen</button>
+	<?= form_close(); ?>
 
 	<div class="card bg-light">
 
@@ -147,11 +163,16 @@
 	        <?php } ?>
 
 	    </tbody>
-
 	</table>
 
 </div>
 
 </body>
-
+<script>
+	$(document).ready(function(){
+		$("#ubah-absensi").click(function(){
+			$(".enable").removeAttr("disabled");
+		})
+	})
+</script>
 </html>

@@ -169,7 +169,7 @@ class Absensi extends CI_Controller{
                 $config['upload_path']          = './uploads/';
                 $config['allowed_types']        = 'gif|jpg|png';
                 $config['max_size']             = 100;
-                $config['max_width']            = 1024;
+                $config['max_width']            = 1366;
                 $config['max_height']           = 768;
 
                 $this->load->library('upload', $config);
@@ -221,25 +221,53 @@ class Absensi extends CI_Controller{
         // redirect(site_url('Absensi'));
     }
 
-    public function update(){
-        $id = $_POST['id'];
-        
-        $nama = $_POST['nama'];
-        $alamat = $_POST['alamat'];
-        $notelp = $_POST['notelp'];
+    public function update($idtgl = 0){
+        if(isset($_POST['updateabsen'])){
+            $idtgl = $_POST['idtgl'];
+            $hadir = $_POST['kehadiran'];
+            // $tanggal = $_POST['tanggal'];
+            foreach ($hadir as $kehadiran => $val) {
+                $this->absensi_model->qry('UPDATE tbl_kehadiran SET hadir = "'.$val.'" WHERE id_tgl = '.$idtgl.' AND id = ' .$kehadiran);
+            }
+            $this->session->set_flashdata('update_absensi_berhasil', '<div class="alert alert-success alert-dismissible fade show role="alert"">Berhasil Update Absen! <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+            redirect('Absensi/rekor_presensi');
+        }
+        else{
+            $where['id'] = $_POST['id'];
+            
+            $data['nama'] = $_POST['nama'];
+            $data['alamat'] = $_POST['alamat'];
+            $data['notelp'] = $_POST['notelp'];
+            
+            // $data = array(
+            //     'nama' => $nama,
+            //     'alamat' => $alamat,
+            //     'notelp' => $notelp
+            //  );
+            
+            // $where = array(
+            //     'id' => $id
+            // );
 
-        $data = array(
-            'nama' => $nama,
-            'alamat' => $alamat,
-            'notelp' => $notelp
-         );
+            $config['upload_path']          = './uploads/';
+            $config['allowed_types']        = 'gif|jpg|png';
+            $config['max_size']             = 100;
+            $config['max_width']            = 1366;
+            $config['max_height']           = 768;
 
-        $where = array(
-            'id' => $id
-        );
-        $res = $this->absensi_model->Update('tbl_anggota', $data, $where);
-        if ($res>0) {
-            redirect('Absensi/daftar_anggota');
+            $this->load->library('upload', $config);
+            if(!$this->upload->do_upload('foto')){
+                echo $this->upload->display_errors();
+            }
+            else{
+                $data['foto'] = $this->upload->data()['file_name'];
+            }
+            
+            $res = $this->absensi_model->Update('tbl_anggota', $data, $where);
+            if ($res>0) {
+                $this->session->set_flashdata('update_success', '<div class="alert alert-success alert-dismissible fade show role="alert"">'.$data['nama'].' berhasil diupdate.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+                redirect('Absensi/daftar_anggota');
+            }
         }
     }
 
@@ -274,11 +302,10 @@ class Absensi extends CI_Controller{
     }
 
     public function presensi_ajax($id = 0){
-        $id = $this->input->get('id');
-        if(isset($id)){
-            $absensi = $this->absensi_model->qry("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal FROM tbl_anggota a, tbl_kehadiran b WHERE a.id=$id AND b.id=$id");
-            return $absensi->result_array();
-        }
+        // $id = $this->input->get('data');
+            $absensi = $this->absensi_model->query("SELECT *, DATE_FORMAT(tanggal,'%d %M %Y') as tanggal 
+                                                  FROM tbl_anggota a, tbl_kehadiran b 
+                                                  WHERE a.id=$id AND b.id=$id");
             echo json_encode($absensi);
     }
     

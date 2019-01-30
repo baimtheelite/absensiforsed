@@ -37,7 +37,7 @@
                 <div class="text-center">
                     <img class="rounded-circle" src="<?= base_url('uploads/'. $foto); ?>" alt="">
                 </div>
-                <form method="post" action="<?php echo base_url('index.php/Absensi/update'); ?>">
+                <?= form_open_multipart('Absensi/update') ?>
                     <input type="hidden" name="id" value="<?php echo $id; ?>">
                 <div class="form-group">
                     <label for="Nama">Nama</label>
@@ -52,6 +52,10 @@
                 <div class="form-group">
                     <label for="notelp">No Telp</label>
                     <input name="notelp" type="text" class="form-control col-sm-5 enable" id="notelp" value="<?=$notelp; ?>" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="foto">Upload Foto</label>
+                    <?= form_upload('foto', NULL,'class="form-control enable" id="foto" disabled') ?>
                 </div>      
                     <button id="kirim" type="submit" class="btn btn-primary enable" disabled>Submit</button> &nbsp;
                     <span id="ubah">Ubah Data?</span>  

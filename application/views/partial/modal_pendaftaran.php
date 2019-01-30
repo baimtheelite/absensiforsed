@@ -28,7 +28,7 @@
             <?= form_open_multipart('Absensi/insert') ?>
         <div class="form-group">
             <label for="Nama">Nama</label>
-            	<?= form_input('nama', set_value(''), 'class="form-control" id="nama" autofocus'); ?>	
+            	<?= form_input('nama', set_value('nama'), 'class="form-control" id="nama" autofocus'); ?>	
             <!-- <input name="nama" type="text" class="form-control" id="nama" autofocus> -->
         </div>
           <div class="form-group">
@@ -40,7 +40,7 @@
         <div class="form-group">
             <label for="notelp">No Telp</label>
             <!-- <input name="notelp" type="text" class="form-control" id="notelp"> -->
-            <?= form_input('notelp', NULL, 'class="form-control" id="notelp"'); ?>	
+            <?= form_input('notelp', set_value('notelp'), 'class="form-control" id="notelp"'); ?>	
         </div>
         <div class="form-group">
           <label for="foto">Upload Photo</label>

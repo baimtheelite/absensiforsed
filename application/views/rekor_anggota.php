@@ -4,76 +4,14 @@
 		<h1 class="text-center">Rekor Absensi Anggota</h1>
 		<p class="text-center">Pengajian Rutin Remaja Sektor 2 BPA</p>
 	</div>
-	<div class="container-fluid">
+	<div class="container">
+	<?= $this->session->flashdata('update_absensi_berhasil'); ?>
 		<div class="row">
-		<!-- REKOR ABSENSI ANGGOTA -->
-        <div class="col-lg-6">
-            <div class="card rekoranggota" style="padding: 8px;">
-            	<div class="card-header bg-primary">
-		            <h2 class="text-center text-light">Rekor Anggota</h2>
-		        </div>
-		        <div class="card-body">
-	            <h2 class="text-info"><?php echo $nama; ?></h2>            
-	               <table class="table small">
-	                   <thead>
-	                        <th>Pertemuan</th>
-	                       <th>Tanggal</th>
-	                       <th>Kehadiran</th>
-	                   </thead>
-	                   <tbody>
-	                    <?php $no = 1; $hadir = 0; $alpha = 0 ?>
-	                    <?php foreach ($absensi as $rekord) { ?>
-	                       <?php if($rekord['hadir'] == "Alpha"){ ?>
-	                       <tr class="bg-danger text-light">
-	                            <td><?=$no.".";?></td>
-	                           <td><?=$rekord['tanggal'];?></td>
-	                           <td><?=$rekord['hadir'];?></td>
-	                       </tr>
-	                       <?php $alpha++; $no++; ?>
-	                       <?php }else{ ?>
-	                            <tr>
-	                            <td><?=$no.".";?></td>
-	                           <td><?=$rekord['tanggal'];?></td>
-	                           <td><?=$rekord['hadir'];?></td>
-	                       </tr>
-	                       <?php $hadir++; $no++; ?>
-	                        <?php } ?>
-	                    <?php } ?>
-	                   </tbody>
-	               </table>
-	               <span class="text-info">Hadir: <?=$hadir;?></span> &nbsp;  <span class="text-danger">Tidak Hadir: <?=$alpha;?></span> 
-				</div>
-			</div>
-
-			<!-- REKOR ABSENSI TERTINGGI -->
-			<div class="card text-center" style="margin-top: 16px">
-				<div class="card-header w3-win8-lime">	
-					<h3>Rekor Absensi Terbanyak:</h3> 
-				</div>
-				<div class="card-body">
-					<h4><?= $max['nama']; ?></h4>
-					<img class="img-circle" src="<?= base_url('uploads/'.$max['foto']);  ?>" alt="no image"><br>
-					<h4>Jumlah Kehadiran Sebanyak:</h4>
-					<h4><?= $max['Jumlah_Hadir']; ?></h4>
-					<a class="btn btn-primary" href="<?= base_url('Absensi/profil/'.$max['id']);  ?>">Lihat profil anggota</a>
-				</div>
-			</div>
-
-			<!-- CETAK LAPORAN ABSENSI -->
-			<div class="card text-center" style="margin-top: 16px">
-				<div class="card-header bg-primary text-white">	
-					<h3>Cetak Laporan Absensi:</h3> 
-				</div>
-				<div class="card-body" style="padding-top: 64px; padding-bottom: 64px;">
-				<a class="btn btn-primary" href="<?= base_url('Absensi/cetak_laporan_absensi') ?>">Download .pdf</a>
-				</div>
-			</div>
-        </div>
-
-		<!-- LIST ANGGOTA-->
-			<div class="col-lg-6">
-			    <div id="rekoranggota" class="table-responsive card">
-					<table class="table table-hover text-center small">
+			<!-- REKOR ABSENSI ANGGOTA -->
+			<div class="col-lg-12">
+				<!-- LIST ANGGOTA-->
+				<div id="rekoranggota" class="container table-responsive card">
+					<table id="rekor" class="table table-hover text-center small">
 						<thead>
 							<tr>
 								<th>No</th>
@@ -92,16 +30,45 @@
 									<td><?=$anggota['nama']; ?></td>
 									<td><?=$anggota['Jumlah_Hadir']; ?></td>
 									<td><?=$anggota['tanggal']?></td>
-									<td><a href="<?= site_url('Absensi/rekor_presensi/'.$anggota['id']) ?>" class="lihat_data btn btn-primary" id="<?=$anggota['id']; ?>">Lihat</a></td>
+									<td><a href="#" class="lihatdata btn btn-primary" data-toggle="modal" data-target="#dataModal" data="<?=$anggota['id']; ?>">Lihat</a></td>
 								</tr>
 								<?php $no++; ?>
 							<?php } ?>
 						</tbody>
 					</table>
-    				</div>
-    			</div>
-    		</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-6">
+			<!-- REKOR ABSENSI TERTINGGI -->
+				<div class="card text-center" style="margin-top: 16px">
+					<div class="card-header w3-win8-lime">	
+						<h3>Rekor Absensi Terbanyak:</h3> 
+					</div>
+					<div class="card-body">
+						<h4><?= $max['nama']; ?></h4>
+						<img class="img-circle" src="<?= base_url('uploads/'.$max['foto']);  ?>" alt="no image"><br>
+						<h4>Jumlah Kehadiran Sebanyak:</h4>
+						<h4><?= $max['Jumlah_Hadir']; ?></h4>
+						<a class="btn btn-primary" href="<?= base_url('Absensi/profil/'.$max['id']);  ?>">Lihat profil anggota</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-6">
+				<!-- CETAK LAPORAN ABSENSI -->
+				<div class="card text-center" style="margin-top: 16px">
+					<div class="card-header bg-primary text-white">	
+						<h3>Cetak Laporan Absensi:</h3> 
+					</div>
+					<div class="card-body" style="padding-top: 64px; padding-bottom: 64px;">
+					<a class="btn btn-primary" href="<?= base_url('Absensi/cetak_laporan_absensi') ?>">Download .pdf</a>
+					</div>
+				</div>
+			</div>
+		</div>
 
+			<!-- REKOR Berdasarkan TANGGAL -->
 			<div class="row">
 				<div class="col-lg-12">			
 					<div class="card" style="margin-top: 20px;">
@@ -134,10 +101,11 @@
 				</div>        
     		</div>
     		 
-    		 <!-- MODAL VIEW REKOR ANGGOTA -->
+    		 
+			 <!-- MODAL VIEW REKOR ANGGOTA -->
     		 <!-- The Modal -->
-			<div class="modal" id="dataModal">
-			  <div class="modal-dialog">
+			<div class="modal fade" id="dataModal">
+			  <div class="modal-dialog modal-lg">
 			    <div class="modal-content">
 
 			      <!-- Modal Header -->
@@ -148,8 +116,22 @@
 
 			      <!-- Modal body -->
 			      <div class="modal-body">
-			        
-			        <div id="absensi_result"></div>
+			        <table class="table table-bordered">
+						<thead>
+							<th>No.</th>
+							<th>Tanggal</th>
+							<th>Kehadiran</th>
+						</thead>
+						<tbody id="tampil-data">
+							<h3 class="text-info text-center" id="nama"></h3>
+							<div class="fotoprofil text-center">
+								<img id="foto" src="" alt="no foto">
+							</div>
+							<!-- MENAMPILKAN REKOR KEHADIRAN ANGGOTA -->
+						</tbody>
+					</table>
+					<span class="text-primary">	Hadir: </span><span id="hadir" ></span>
+					<span class="text-danger">	Alpha: </span><span id="alpha"></span>
 
 			      </div>
 
@@ -164,15 +146,52 @@
 
 			<script>
 				$(document).ready(function(){
-					$('html, body').animate({
-					scrollTop: $(".rekoranggota").offset().top
-				}, 500, function(){
-					$(".rekoranggota").fadeOut(300, function(){
-						$(this).fadeIn(300);
+					$('#rekor').dataTable();
+					$('.lihatdata').click(function(){
+						var nilai = $(this).attr('data');
+						$.ajax({
+							url 		: '<?php echo base_url("Absensi/presensi_ajax/"); ?>'+nilai ,
+							type 		: 'GET',
+							async		: false,
+							dataType 	: 'json',
+							data		: {nilai:nilai},
+							success 	: function(data){
+										var html = '';
+										var nama = '';
+										var hadir = 0;
+										var alpha = 0;
+										var i;
+										for(i = 0; i < data.length; i++){
+											if(data[i].hadir == "Alpha"){
+											html = html + '<tr class="bg-danger text-white">';
+											html = html +'<td>'+(i+1)+'</td>';
+											html = html +'<td>'+data[i].tanggal+'</td>';
+											html = html +'<td>'+data[i].hadir+'</td>';
+											html = html +'</tr>';
+											alpha++;
+											}else{
+											html = html + '<tr>';
+											html = html +'<td>'+(i+1)+'</td>';
+											html = html +'<td>'+data[i].tanggal+'</td>';
+											html = html +'<td>'+data[i].hadir+'</td>';
+											html = html +'</tr>';
+											hadir++;
+											}
+										}
+										$("#nama").html(data[0].nama);
+										$("#foto").attr("src", '<?php echo base_url("uploads/"); ?>' +data[0].foto);
+										$("#tampil-data").html(html);
+
+										$("#hadir").html(hadir);
+										$("#alpha").html(alpha);
+										// $("#tampil-data").append("</table>");
+							}
+						});																											
 					})
-				});
-					
 				});
 			</script>
 			
+ 
+ 
+ 
  <?php $this->load->view('partial/modal_pendaftaran'); ?>
