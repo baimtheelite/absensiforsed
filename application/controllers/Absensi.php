@@ -229,7 +229,7 @@ class Absensi extends CI_Controller{
             foreach ($hadir as $kehadiran => $val) {
                 $this->absensi_model->qry('UPDATE tbl_kehadiran SET hadir = "'.$val.'" WHERE id_tgl = '.$idtgl.' AND id = ' .$kehadiran);
             }
-            $this->session->set_flashdata('update_absensi_berhasil', '<div class="alert alert-success alert-dismissible fade show role="alert"">Berhasil Update Absen! <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+            $this->session->set_flashdata('update_absensi_berhasil', '<div class="alert alert-success alert-dismissible fade show role="alert"">Berhasil Update data absensi di pertemuan ke-'.$idtgl.'! <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
             redirect('Absensi/rekor_presensi');
         }
         else{
@@ -271,13 +271,13 @@ class Absensi extends CI_Controller{
         }
     }
 
-    public function delete($id){
+    public function delete($id){        
         $id = array(
             'id' => $id
         );
         $this->absensi_model->Delete('tbl_anggota', $id);
-        redirect(site_url('Absensi/daftar_anggota'));
-    }
+        redirect(site_url('Absensi/rekor_presensi'));
+        }
 
     public function deletemuhadir($id){
         $id = array(
@@ -285,6 +285,17 @@ class Absensi extends CI_Controller{
         );
         $this->absensi_model->Delete('tbl_muhadir', $id);
         redirect(site_url('Absensi/daftar_anggota'));
+    }
+
+    public function delete_tgl($idtgl){
+        $idtgl = array(
+            'id_tgl' => $idtgl
+        );
+        $id = $this->absensi_model->Delete('tbl_kehadiran', $idtgl);
+        if($id){
+            $this->session->set_flashdata('delete_tgl_success', '<div class="alert alert-success alert-dismissible fade show role="alert"">Rekor Absensi di pertemuan ke-'. $idtgl.' berhasil dihapus!.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+            redirect(site_url('Absensi/rekor_presensi'));
+        }
     }
     
 
@@ -318,7 +329,10 @@ class Absensi extends CI_Controller{
                                             order by nama asc"
                                         );
 
-        $not = $this->absensi_model->query("SELECT id, nama FROM tbl_anggota WHERE id NOT IN(SELECT id FROM tbl_kehadiran WHERE id_tgl = $id) ORDER BY nama"); 
+        $not = $this->absensi_model->query("SELECT id, nama 
+                                            FROM tbl_anggota 
+                                            WHERE id NOT IN(SELECT id FROM tbl_kehadiran WHERE id_tgl = $id) 
+                                            ORDER BY nama"); 
         
         $data = array(
             'data' => $data,

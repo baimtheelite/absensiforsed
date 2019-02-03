@@ -1,10 +1,10 @@
 <?php $this->load->view('partial/header'); ?>
 
   <div class="container">
-    <div class="row" style="margin-top: 16px;">
-        <?php echo $this->session->flashdata('message'); ?>
+    <?php echo $this->session->flashdata('message'); ?>
     <?php echo $this->session->flashdata('success'); ?>
     <?php echo $this->session->flashdata('muhadir_success'); ?>
+    <div class="row" style="margin-top: 16px;">
 
       <div class="col-lg-12">
 

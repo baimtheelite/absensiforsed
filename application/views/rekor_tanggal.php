@@ -73,7 +73,7 @@
 
 			<?php if($rekortgl['hadir'] == "Alpha"){ ?>
 
-			<tr class="bg-light">
+			<tr class="w3-win8-teal">
 
 				<td><?=$no; ?>.</td>
 
@@ -131,25 +131,16 @@
 	<h4 class="text-center">Anggota yang belum terdaftar pada saat pertemuan ini</h4>
 
 	<table class="table">
-
 	    <thead>
-
 	        <tr>
-
 	            <th>No</th>
 
 	            <th>Nama</th>
-
 	        </tr>
-
 	    </thead>
-
 	    <tbody>
-
 	        <?php $no = 1; ?>
-
-	        <?php foreach($not as $belum){ ?>
-
+	        <?php foreach($not as $belum){ ?
 	            <tr>
 
 	                <td><?=$no; ?>.</td>

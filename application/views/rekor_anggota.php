@@ -6,6 +6,7 @@
 	</div>
 	<div class="container">
 	<?= $this->session->flashdata('update_absensi_berhasil'); ?>
+	<?= $this->session->flashdata('delete_tgl_success'); ?>
 		<div class="row">
 			<!-- REKOR ABSENSI ANGGOTA -->
 			<div class="col-lg-12">
@@ -77,24 +78,25 @@
 						</div>
 						<div id="rekortanggal" class="card-body">
 							<table class="table small">
-									<thead>
-										<th>Pertemuan</th>
-										<th>Tanggal</th>
-										<th>Muhadir</th>
-										<th></th>
-									</thead>
-									<tbody>
-										<?php $no = 1; ?>
-										<?php foreach ($rekortgl as $rekor) {?>
-										<tr>
-											<td><?=$no; ?>.</td>
-											<td><?=$rekor['tgl']; ?></td>
-											<td><?=$rekor['muhadir']; ?></td>
-											<td><a class="btn btn-primary" href="<?=base_url('Absensi/rekor_tanggal/').$rekor['id_tgl']; ?>">Lihat</a></td>
-										</tr>
-										<?php $no++; ?>
-										<?php } ?>
-									</tbody>
+								<thead>
+									<th>Pertemuan</th>
+									<th>Tanggal</th>
+									<th>Muhadir</th>
+									<th colspan="2"></th>
+								</thead>
+								<tbody>
+									<?php $no = 1; ?>
+									<?php foreach ($rekortgl as $rekor) {?>
+									<tr>
+										<td><?=$no; ?>.</td>
+										<td><?=$rekor['tgl']; ?></td>
+										<td><?=$rekor['muhadir']; ?></td>
+										<td><a class="btn btn-primary" href="<?=base_url('Absensi/rekor_tanggal/').$rekor['id_tgl']; ?>">Lihat</a></td>
+										<td><a onclick="return confirm('Apakah Anda yakin? \n ingin menghapus rekor absensi pada pertemuan ke-<?= $no; ?>')" class="btn btn-danger" href="<?=base_url('Absensi/delete_tgl/').$rekor['id_tgl']; ?>">Delete</a></td>
+									</tr>
+									<?php $no++; ?>
+									<?php } ?>
+								</tbody>
 							</table>
 						</div>
 					</div>
@@ -130,8 +132,20 @@
 							<!-- MENAMPILKAN REKOR KEHADIRAN ANGGOTA -->
 						</tbody>
 					</table>
-					<span class="text-primary">	Hadir: </span><span id="hadir" ></span>
-					<span class="text-danger">	Alpha: </span><span id="alpha"></span>
+					<div class="row">
+						<div class="col-md-4">
+						
+						</div>
+						<div class="col-md-4 card">
+							<div class="card-body text-center">
+								<span class="text-primary">	Hadir: </span><span id="hadir" ></span><br>
+								<span class="text-danger">	Alpha: </span><span id="alpha"></span>			
+							</div>
+						</div>
+						<div class="col-md-4">
+						
+						</div>
+					</div>
 
 			      </div>
 
@@ -147,7 +161,7 @@
 			<script>
 				$(document).ready(function(){
 					$('#rekor').dataTable();
-					$('.lihatdata').click(function(){
+					$('#rekor').on('click','a.lihatdata', function(){
 						var nilai = $(this).attr('data');
 						$.ajax({
 							url 		: '<?php echo base_url("Absensi/presensi_ajax/"); ?>'+nilai ,
